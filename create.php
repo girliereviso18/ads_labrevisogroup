@@ -1,0 +1,95 @@
+<?php
+require_once "config.php";
+
+$id= $name = $description = $clasification = "";
+$id_error = $name_error = $description_error = $classification_error = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $name = trim($_POST["name"]);
+
+    if (empty($name)) {
+        $name_error = "name is required.";
+    } elseif (!filter_var($name, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[a-zA-Z\s]+$/")))) {
+        $name_error = "name is invalid.";
+    } else {
+        $name = $name;
+    }
+
+    $description = trim($_POST["description"]);
+    if (empty($description)) {
+        $description_error = "description is required.";
+    } elseif (!filter_var($description, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[a-zA-Z\s]+$/")))) {
+        $description_error = "Please enter a description.";
+    } else {
+        $description = $description;
+    }
+
+    $classification = trim($_POST["classification"]);
+    if(empty($classification)){
+        $classification_error = "classification is required.";
+    } else {
+        $classification = $classification;
+    }
+
+    if (empty($id_error) && empty($name_error) && empty($description_error) && empty($clasification_error) ) {
+          $sql = "INSERT INTO users (name, description, classification) VALUES ('$name', '$description', '$classification')";
+
+          if (mysqli_query($conn, $sql)) {
+              header("location: index.php");
+          } else {
+               echo "Something went wrong. Please try again later.";
+          }
+      }
+    mysqli_close($conn);
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animals</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <style type="text/css">
+        .wrapper {
+            width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header">
+                        <h2>Animals</h2>
+                    </div>
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+
+                        <div class="form-group <?php echo (!empty($name_error)) ? 'has-error' : ''; ?>">
+                            <label>name</label>
+                            <input type="text" name="name" class="form-control" value="">
+                            <span class="help-block"><?php echo $name_error;?></span>
+                        </div>
+
+                        <div class="form-group <?php echo (!empty($description_error)) ? 'has-error' : ''; ?>">
+                            <label>description</label>
+                            <input type="text" name="description" class="form-control" value="">
+                            <span class="help-block"><?php echo $description_error;?></span>
+                        </div>
+
+                        <div class="form-group <?php echo (!empty($classification_error)) ? 'has-error' : ''; ?>">
+                            <label>classification</label>
+                            <input type="text" name="classification" class="form-control" value="">
+                            <span class="help-block"><?php echo $classification_error;?></span>
+                        </div>
+                        <input type="submit" class="btn btn-primary" value="Submit">
+                        <a href="index.php" class="btn btn-default">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
